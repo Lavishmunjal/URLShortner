@@ -1,13 +1,37 @@
 import * as React from 'react';
 import FormContainer from './FormContainer';
+import { UrlData } from '../interface/UrlData';
+import { serverUrl } from '../helper/Constants';
+import axios from 'axios';
+import DataTable from './Datatable';
 
 interface IContainerProps {
 }
 
 const Container: React.FunctionComponent<IContainerProps> = () => {
+  const [data, setData] = React.useState<UrlData[]>([]) 
+  const [reload, setReload] = React.useState<boolean>(false)
+
+  const updateReloadState = ():void=>{
+    setReload(true)
+  }
+
+  const fetchTableData = async ()=>{
+    const response = await axios.get(`${serverUrl}/shortUrl`)
+    console.log("The response from server is ", response);
+    setData(response.data)
+    setReload(false)
+    // console.log("Data", data);
+    
+  }
+
+  React.useEffect(()=>{
+    fetchTableData()
+  },[reload])
   return (
     <>
-    <FormContainer/>
+    <FormContainer updateReloadState={updateReloadState}/>
+    <DataTable updateReloadState={updateReloadState} data={data}/>
     </>
   )
 };
